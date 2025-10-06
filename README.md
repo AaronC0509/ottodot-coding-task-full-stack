@@ -105,13 +105,13 @@ Create a new API route that handles:
 
 ### 3. Requirements Checklist
 
-- [ ] AI generates appropriate Primary 5 level math problems
-- [ ] Problems and answers are saved to Supabase
-- [ ] User submissions are saved with feedback
-- [ ] AI generates helpful, personalized feedback
-- [ ] UI is clean and mobile-responsive
-- [ ] Error handling for API failures
-- [ ] Loading states during API calls
+- [✅] AI generates appropriate Primary 5 level math problems
+- [✅] Problems and answers are saved to Supabase
+- [✅] User submissions are saved with feedback
+- [✅] AI generates helpful, personalized feedback
+- [✅] UI is clean and mobile-responsive
+- [✅] Error handling for API failures
+- [✅] Loading states during API calls
 
 ## Deployment
 
@@ -124,36 +124,32 @@ Create a new API route that handles:
 
 ## Assessment Submission
 
-When submitting your assessment, provide:
-
-1. **GitHub Repository URL**: Make sure it's public
-2. **Live Demo URL**: Your Vercel deployment
-3. **Supabase Credentials**: Add these to your README for testing:
-   ```
-   SUPABASE_URL: [Your Supabase Project URL]
-   SUPABASE_ANON_KEY: [Your Supabase Anon Key]
-   ```
+1) Live Demo URL provided here: https://math-problem-generator-rosy.vercel.app/
+2) Project Secret Keys:
+```
+NEXT_PUBLIC_SUPABASE_URL=https://reounsmrjbykzlyyzqgc.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJlb3Vuc21yamJ5a3pseXl6cWdjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk3Mjc2NjcsImV4cCI6MjA3NTMwMzY2N30.RxkOz2eh4W2nAqAy79mGJPtxo0uYM2M-5QRVT8Ichu8
+GOOGLE_API_KEY=AIzaSyAlwWjz8YYXFOr9hdDk_iqHUjrHDFIzCjU
+```
 
 ## Implementation Notes
 
-*Please fill in this section with any important notes about your implementation, design decisions, challenges faced, or features you're particularly proud of.*
-
 ### My Implementation:
 
-- 
-- 
-- 
+- Gemini Integration: This was my first time to integrate Gemini actually, it feels impressed!
+- Challenges Faced: Most likely the prompt side take a very important role, I was using Claude to help me to enhance the prompt
+- Desired Feature: I was thinking to implement RAG into this assessment (but I started to work on the project Monday, no time to do this), whereby I can directly read from pdf and let using AI to convert the text into vector db, and then we can having dynamic topic followed based on what we upload.
 
 ## Additional Features (Optional)
 
 If you have time, consider adding:
 
-- [ ] Difficulty levels (Easy/Medium/Hard)
-- [ ] Problem history view
-- [ ] Score tracking
-- [ ] Different problem types (addition, subtraction, multiplication, division)
-- [ ] Hints system
-- [ ] Step-by-step solution explanations
+- [✅] Difficulty levels (Easy/Medium/Hard)
+- [✅] Problem history view
+- [✅] Score tracking (via history statistics)
+- [✅] Different problem types (fractions, decimals, percentage, ratio, average, area/perimeter, volume, angles)
+- [✅] Hints system
+- [✅] Step-by-step solution explanations (via AI feedback)
 
 ---
 
