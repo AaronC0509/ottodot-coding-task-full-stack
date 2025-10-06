@@ -18,18 +18,21 @@ export type Database = {
           created_at: string
           problem_text: string
           correct_answer: number
+          difficulty: string
         }
         Insert: {
           id?: string
           created_at?: string
           problem_text: string
           correct_answer: number
+          difficulty?: string
         }
         Update: {
           id?: string
           created_at?: string
           problem_text?: string
           correct_answer?: number
+          difficulty?: string
         }
       }
       math_problem_submissions: {
@@ -39,6 +42,7 @@ export type Database = {
           user_answer: number
           is_correct: boolean
           feedback_text: string
+          hints_used?: number
         }
         Insert: {
           id?: string
@@ -46,6 +50,7 @@ export type Database = {
           user_answer: number
           is_correct: boolean
           feedback_text: string
+          hints_used?: number
         }
         Update: {
           id?: string
@@ -53,6 +58,7 @@ export type Database = {
           user_answer?: number
           is_correct?: boolean
           feedback_text?: string
+          hints_used?: number
         }
       }
     }

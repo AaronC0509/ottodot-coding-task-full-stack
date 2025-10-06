@@ -14,10 +14,12 @@ const PRIMARY_5_TOPICS = [
   'decimals',
   'percentage',
   'ratio',
+  'average',
   'rate and speed',
-  'area and perimeter',
-  'volume',
-  'four operations',
+  'area and perimeter of composite figures',
+  'volume of cubes and cuboids',
+  'angles in geometric figures',
+  'four operations with whole numbers up to 10 million',
   'word problems with money'
 ]
 
@@ -29,7 +31,7 @@ export async function POST(request: NextRequest) {
       return handleSubmission(body)
     }
 
-    return generateNewProblem()
+    return generateNewProblem(body.difficulty || 'medium')
   } catch (error) {
     console.error('API Error:', error)
     return NextResponse.json(
@@ -39,24 +41,70 @@ export async function POST(request: NextRequest) {
   }
 }
 
-async function generateNewProblem() {
+async function generateNewProblem(difficulty: 'easy' | 'medium' | 'hard' = 'medium') {
   try {
     const topic = PRIMARY_5_TOPICS[Math.floor(Math.random() * PRIMARY_5_TOPICS.length)]
 
-    const prompt = `Generate a math word problem suitable for Primary 5 students (age 10-11) in Singapore.
+    const difficultyRequirements = {
+      easy: {
+        numbers: 'Use smaller numbers (up to 10,000 for whole numbers, simple fractions like 1/2, 1/4, 1/5)',
+        steps: '1-2 steps to solve',
+        complexity: 'Simple, straightforward language suitable for Primary 5',
+        operations: 'Focus on single operations or simple combinations',
+        decimals: 'Up to 1 decimal place',
+        percentages: 'Simple percentages like 10%, 25%, 50%',
+        ratio: 'Simple ratios like 1:2, 2:3',
+        average: 'Finding average of 3-4 numbers'
+      },
+      medium: {
+        numbers: 'Use moderate numbers (up to 1,000,000 for whole numbers, fractions with denominators up to 10)',
+        steps: '2-3 steps to solve',
+        complexity: 'Clear language with Primary 5 mathematical vocabulary',
+        operations: 'Combination of 2-3 operations following order of operations',
+        decimals: 'Up to 2 decimal places',
+        percentages: 'Common percentages like 15%, 20%, 25%, 40%, 50%, 75%',
+        ratio: 'Ratios with 2-3 quantities, simple equivalent ratios',
+        average: 'Finding average of 5-6 numbers, or finding missing value given average'
+      },
+      hard: {
+        numbers: 'Use larger numbers (up to 10,000,000 for whole numbers, mixed fractions, fractions with denominators up to 12)',
+        steps: '3-4 steps to solve',
+        complexity: 'More complex scenarios with multiple conditions, Primary 5 level',
+        operations: 'Multiple operations with brackets and order of operations',
+        decimals: 'Up to 3 decimal places as per P5 syllabus',
+        percentages: 'Any percentage values including increase/decrease problems',
+        ratio: 'Complex ratio problems with 3 quantities, finding unknown values',
+        average: 'Complex average problems with missing values or combined sets'
+      }
+    }
+
+    const req = difficultyRequirements[difficulty]
+
+    const prompt = `Generate a math word problem suitable for Primary 5 students (age 10-11) in Singapore, following the MOE Primary Mathematics Syllabus.
 
 Topic: ${topic}
+Difficulty Level: ${difficulty.toUpperCase()}
+
+Primary 5 Syllabus Context:
+- Students at this level work with whole numbers up to 10 million
+- They understand fractions (all four operations), decimals (up to 3 decimal places), percentages
+- They are introduced to ratio, average, rate and speed
+- Geometry includes area/perimeter of composite figures, volume of cubes/cuboids, angles
 
 Requirements:
-- The problem should be realistic and engaging for children
-- Use Singapore context when appropriate (e.g., Singapore dollars, local places)
-- Numbers should be appropriate for Primary 5 level:
-  * Whole numbers up to 10,000,000
-  * Fractions with denominators up to 12
-  * Decimals up to 3 decimal places
-  * Percentages (common values like 10%, 25%, 50%, 75%)
-- The problem should require 2-3 steps to solve
-- Avoid overly complex language
+- The problem should be realistic and engaging for 10-11 year old children
+- Use Singapore context when appropriate (e.g., Singapore dollars, HDB flats, MRT, hawker centres)
+- Difficulty specifications:
+  * ${req.numbers}
+  * ${req.steps}
+  * ${req.complexity}
+  * ${req.operations}
+  * Decimals: ${req.decimals}
+  * Percentages: ${req.percentages}
+  ${topic === 'ratio' ? `* Ratio: ${req.ratio}` : ''}
+  ${topic === 'average' ? `* Average: ${req.average}` : ''}
+- Ensure the problem aligns with Primary 5 syllabus standards
+- Make sure the difficulty truly matches the ${difficulty} level
 
 You must respond with ONLY a JSON object in this exact format:
 {
@@ -94,7 +142,8 @@ Example response:
       .from('math_problem_sessions')
       .insert({
         problem_text: problemData.problem_text,
-        correct_answer: problemData.final_answer
+        correct_answer: problemData.final_answer,
+        difficulty: difficulty
       })
       .select()
       .single()
@@ -109,7 +158,8 @@ Example response:
       problem: {
         problem_text: problemData.problem_text,
         final_answer: problemData.final_answer
-      }
+      },
+      difficulty: difficulty
     })
   } catch (error) {
     console.error('Problem generation error:', error)
@@ -122,7 +172,7 @@ Example response:
 
 async function handleSubmission(body: any) {
   try {
-    const { sessionId, userAnswer } = body
+    const { sessionId, userAnswer, hintsUsed = 0 } = body
 
     if (!sessionId || userAnswer === undefined) {
       return NextResponse.json(
@@ -153,6 +203,7 @@ async function handleSubmission(body: any) {
 Problem: "${session.problem_text}"
 Correct Answer: ${correctAnswer}
 Student's Answer: ${userAnswerNum}
+Hints Used: ${hintsUsed}
 Result: ${isCorrect ? 'CORRECT' : 'INCORRECT'}
 
 Please generate encouraging and educational feedback for the student.
@@ -160,6 +211,7 @@ Please generate encouraging and educational feedback for the student.
 Guidelines:
 - Use simple, clear language appropriate for a 10-11 year old
 - Be encouraging and positive, even if the answer is wrong
+- If they used hints (${hintsUsed} hints), acknowledge it positively and encourage their problem-solving effort
 - If correct: Congratulate them and briefly explain why their approach worked
 - If incorrect:
   * Be supportive and encouraging
@@ -182,7 +234,8 @@ Respond with ONLY the feedback text, no JSON or formatting.`
         session_id: sessionId,
         user_answer: userAnswerNum,
         is_correct: isCorrect,
-        feedback_text: feedback
+        feedback_text: feedback,
+        hints_used: hintsUsed
       })
 
     if (submissionError) {
